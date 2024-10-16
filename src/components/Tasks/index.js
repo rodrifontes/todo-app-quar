@@ -1,3 +1,4 @@
+import { TouchableOpacity, FlatList } from 'react-native';
 import { Text } from '../Text';
 
 import {
@@ -14,36 +15,41 @@ import pending from '../../assets/images/pending.png';
 import done from '../../assets/images/done.png';
 import edit from '../../assets/images/edit.png';
 import excluir from '../../assets/images/delete.png';
-import { TouchableOpacity } from 'react-native';
 
-export default function Tasks() {
+export default function Tasks({ tasks, onEdit, onDelete, onChangeStatus }) {
   return (
-    <Task>
-      <TaskHeader>
-        <Text size={18} weight="600">Estudar React Native</Text>
-      </TaskHeader>
+    <FlatList
+      data={tasks}
+      keyExtractor={task => task.id}
+      renderItem={({ item: task }) => (
+        <Task>
+          <TaskHeader>
+            <Text size={18} weight="600">{task.title}</Text>
+          </TaskHeader>
 
-      <TaskDescription>
-        <Text opacity={0.5}>Estudar para o Simulado 01</Text>
-      </TaskDescription>
+          <TaskDescription>
+            <Text opacity={0.5}>{task.description}</Text>
+          </TaskDescription>
 
-      <TaskFooter>
-        <TaskStatus onPress={() => alert('Alterando o status da tarefa')}>
-          <TaskIcon source={pending} />
+          <TaskFooter>
+            <TaskStatus onPress={() => onChangeStatus(task)}>
+              <TaskIcon source={task.done ? done : pending} />
 
-          <Text color="#E620AE">Pendente</Text>
-        </TaskStatus>
+              <Text color={task.done ? '#2192d8' : '#E620AE'}>{task.done ? 'Feita' : 'Pendente'}</Text>
+            </TaskStatus>
 
-        <TaskActions>
-          <TouchableOpacity onPress={() => alert('Alterando Tarefa')}>
-            <TaskIcon source={edit} />
-          </TouchableOpacity>
+            <TaskActions>
+              <TouchableOpacity onPress={() => onEdit(task)}>
+                <TaskIcon source={edit} />
+              </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => alert('Excluindo Tarefa')}>
-            <TaskIcon source={excluir} />
-          </TouchableOpacity>
-        </TaskActions>
-      </TaskFooter>
-    </Task>
+              <TouchableOpacity onPress={() => onDelete(task)}>
+                <TaskIcon source={excluir} />
+              </TouchableOpacity>
+            </TaskActions>
+          </TaskFooter>
+        </Task>
+      )}
+    />
   );
 }
