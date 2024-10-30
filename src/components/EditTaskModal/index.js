@@ -1,19 +1,22 @@
 import { Image, TouchableOpacity } from 'react-native';
 
-import { Text } from '../Text';
-
 import CustomModal from '../CustomModal';
+
+import { Text } from '../Text';
 
 import { Header } from './styles';
 
 import close from '../../assets/images/close.png';
 import TaskForm from '../TaskForm';
 
-export default function NewTaskModal({ visible, onClose, onSave }) {
+export default function EditTaskModal({ visible, onClose, onSave, task }) {
   return (
-    <CustomModal visible={visible} onClose={onClose}>
+    <CustomModal
+      visible={visible}
+      onClose={onClose}
+    >
       <Header>
-        <Text weight="600">Adicionar Tarefa</Text>
+        <Text weight="600">Editar Tarefa</Text>
 
         <TouchableOpacity onPress={onClose}>
           <Image source={close} />
@@ -21,8 +24,9 @@ export default function NewTaskModal({ visible, onClose, onSave }) {
       </Header>
 
       <TaskForm
-        buttonLabel="Cadastrar"
+        buttonLabel="Alterar"
         onSave={onSave}
+        task={task}
       />
     </CustomModal>
   );
