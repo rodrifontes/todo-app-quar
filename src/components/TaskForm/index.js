@@ -4,9 +4,9 @@ import { Form, Input } from "./styles";
 
 import Button from '../Button';
 
-export default function TaskForm({ onSave }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+export default function TaskForm({ onSave, task, buttonLabel }) {
+  const [title, setTitle] = useState(task?.title ?? '');
+  const [description, setDescription] = useState(task?.description ?? '');
 
   return (
     <Form>
@@ -26,7 +26,7 @@ export default function TaskForm({ onSave }) {
         disabled={title.length === 0 || description.length === 0}
         onPress={() => onSave({ title, description })}
       >
-        Cadastrar
+        {buttonLabel}
       </Button>
     </Form>
   );
