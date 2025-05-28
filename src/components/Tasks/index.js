@@ -50,7 +50,7 @@ export default function Tasks({
                 <TaskIcon source={edit} />
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => onDeleteTask(task)}>
+              <TouchableOpacity onPress={() => onDeleteTask(task.id)}>
                 <TaskIcon source={excluir} />
               </TouchableOpacity>
             </TaskActions>

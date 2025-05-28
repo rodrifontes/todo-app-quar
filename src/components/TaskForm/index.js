@@ -5,6 +5,7 @@ import { Form, Input } from "./styles";
 import Button from '../Button';
 
 export default function TaskForm({ onSave, task, buttonLabel }) {
+  const [id] = useState(task?.id ?? '');
   const [title, setTitle] = useState(task?.title ?? '');
   const [description, setDescription] = useState(task?.description ?? '');
 
@@ -24,7 +25,7 @@ export default function TaskForm({ onSave, task, buttonLabel }) {
 
       <Button
         disabled={title.length === 0 || description.length === 0}
-        onPress={() => onSave({ title, description })}
+        onPress={() => onSave({ id, title, description })}
       >
         {buttonLabel}
       </Button>

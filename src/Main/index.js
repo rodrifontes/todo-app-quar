@@ -1,10 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Text } from '../components/Text';
 
 import { Container, TaskEmptyContainer, TaskEmptyImage, CenteredContainer } from './styles';
-
-import { tasks as mock } from '../mocks/tasks';
 
 import Header from '../components/Header';
 import Tasks from '../components/Tasks';
@@ -16,23 +14,45 @@ import EditTaskModal from '../components/EditTaskModal';
 
 import task from '../assets/images/task.png';
 import { ActivityIndicator } from 'react-native';
+import { useTasksDatabase } from '../database/useTasksDatabase';
 
 export default function Main() {
-  const [tasks, setTasks] = useState(mock);
+  const [tasks, setTasks] = useState([]);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isNewTaskModalVisible, setIsNewTaskModalVisible] = useState(false);
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
   const [taskBeingEdit, setTaskBeingEdit] = useState(null);
+  const [taskIdBeingDelete, setTaskIdBeingDelete] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const tasksDatabase = useTasksDatabase();
+
+  async function getTasks() {
+    setIsLoading(true);
+    try {
+      setTasks(await tasksDatabase.show());
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getTasks();
+  }, []);
+
   //Função que é chamada quando o usuario solicita a exclusão
-  function handleDeleteTask(task) {
+  function handleDeleteTask(id) {
+    setTaskIdBeingDelete(id);
     setIsDeleteModalVisible(true);
   }
 
   // Função que vai efetivar a exclusão
   function handleDeleteConfirmTask() {
-    // Efetivar a exclusão
+    tasksDatabase.remove(taskIdBeingDelete);
+    setTaskIdBeingDelete(null);
+    getTasks();
     setIsDeleteModalVisible(false);
   }
 
@@ -42,16 +62,19 @@ export default function Main() {
   }
 
   function handleChangeStatusTask(task) {
-    alert(`Alterar Status Tarefa ID: ${task.id}`);
+    tasksDatabase.updateStatus(task.id);
+    getTasks();
   }
 
-  function handleCreateTask() {
-    //Persistir Tarefa
+  function handleCreateTask(task) {
+    tasksDatabase.create(task);
+    getTasks();
     setIsNewTaskModalVisible(false);
   }
 
-  function handleSaveEdit() {
-    //Persistir ALteração da Tarefa
+  function handleSaveEdit(task) {
+    tasksDatabase.update(task);
+    getTasks();
     setIsEditTaskModalVisible(false);
   }
 
