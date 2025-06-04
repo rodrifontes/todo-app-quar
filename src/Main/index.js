@@ -16,6 +16,8 @@ import task from '../assets/images/task.png';
 import { ActivityIndicator } from 'react-native';
 import { useTasksDatabase } from '../database/useTasksDatabase';
 
+import { api } from '../utils/api';
+
 export default function Main() {
   const [tasks, setTasks] = useState([]);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -23,7 +25,7 @@ export default function Main() {
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
   const [taskBeingEdit, setTaskBeingEdit] = useState(null);
   const [taskIdBeingDelete, setTaskIdBeingDelete] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const tasksDatabase = useTasksDatabase();
 
@@ -39,7 +41,15 @@ export default function Main() {
   }
 
   useEffect(() => {
-    getTasks();
+    //getTasks();
+    api.get('/tasks')
+      .then((response) => {
+        setTasks(response.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   //Função que é chamada quando o usuario solicita a exclusão
@@ -50,9 +60,14 @@ export default function Main() {
 
   // Função que vai efetivar a exclusão
   function handleDeleteConfirmTask() {
-    tasksDatabase.remove(taskIdBeingDelete);
+    //tasksDatabase.remove(taskIdBeingDelete);
+    //getTasks();
+    api.delete(`/tasks/${taskIdBeingDelete}`)
+      .then(() => {
+        setTasks(tasks.filter(task => task.id !== taskIdBeingDelete));
+      });
+
     setTaskIdBeingDelete(null);
-    getTasks();
     setIsDeleteModalVisible(false);
   }
 
@@ -61,20 +76,43 @@ export default function Main() {
     setIsEditTaskModalVisible(true);
   }
 
-  function handleChangeStatusTask(task) {
-    tasksDatabase.updateStatus(task.id);
-    getTasks();
+  async function handleChangeStatusTask(task) {
+    //tasksDatabase.updateStatus(task.id);
+    //getTasks();
+
+    const taskChange = (await api.put(`/tasks/status/${task.id}`, task)).data;
+
+    setTasks((prevState) => {
+      const itemIndex = prevState.findIndex(taskItem => taskItem.id === task.id);
+      const newTasks = [...prevState];
+      newTasks[itemIndex] = taskChange;
+
+      return newTasks;
+    });
   }
 
-  function handleCreateTask(task) {
-    tasksDatabase.create(task);
-    getTasks();
+  async function handleCreateTask(task) {
+    //tasksDatabase.create(task);
+    //getTasks();
+    const taskAdd = (await api.post('/tasks', task)).data;
+    tasks.unshift(taskAdd);
+
     setIsNewTaskModalVisible(false);
   }
 
-  function handleSaveEdit(task) {
-    tasksDatabase.update(task);
-    getTasks();
+  async function handleSaveEdit(task) {
+    //tasksDatabase.update(task);
+    //getTasks();
+    const taskChange = (await api.put(`/tasks/${task.id}`, task)).data;
+
+    setTasks((prevState) => {
+      const itemIndex = prevState.findIndex(taskItem => taskItem.id === task.id);
+      const newTasks = [...prevState];
+      newTasks[itemIndex] = taskChange;
+
+      return newTasks;
+    });
+
     setIsEditTaskModalVisible(false);
   }
 

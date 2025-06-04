@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "axios": "^1.9.0",
     "expo": "~52.0.46",
     "expo-font": "~13.0.4",
     "expo-sqlite": "~15.1.4",
